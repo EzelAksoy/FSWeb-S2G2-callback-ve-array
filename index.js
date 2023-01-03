@@ -8,13 +8,21 @@ const { fifaData } = require('./fifa.js')
 
 //(a) 2014 Dünya kupası Finali Evsahibi takım ismi (dizide "Home Team Name" anahtarı)
 
+let NewArray = fifaData.filter (i => i["Year"]===2014 && i["Stage"]=== "Final");
+console.log(NewArray);
+console.log(NewArray[0]['Home Team Name']);
 //(b) 2014 Dünya kupası Finali Deplasman takım ismi  (dizide "Away Team Name" anahtarı)
-
+console.log(NewArray[0]['Away Team Name']);
 //(c) 2014 Dünya kupası finali Ev sahibi takım golleri (dizide "Home Team Goals" anahtarı)
-
+console.log(NewArray[0]['Home Team Goals']);
 //(d)2014 Dünya kupası finali Deplasman takım golleri  (dizide "Away Team Goals" anahtarı)
-
+console.log(NewArray[0]['Away Team Goals']);
 //(e) 2014 Dünya kupası finali kazananı*/
+if(NewArray[0]['Away Team Goals'] > NewArray[0]['Home Team Goals']){ 
+console.log(NewArray[0]['Away Team Name']);}
+else {console.log(NewArray[0]['Home Team Name'])};
+
+
 
 
 /*  Görev 2: 
@@ -25,12 +33,14 @@ const { fifaData } = require('./fifa.js')
 	💡 İPUCU - verilen data içindeki nesnelerin(objects) "Stage" anahtarına bakmalısınız
 */
 
-function Finaller(/* kodlar buraya */) {
-	
-    /* kodlar buraya */
+function Finaller(GelenDizi) {
+let YeniDizi = GelenDizi.filter(i=>i["Stage"]==="Final");
+return YeniDizi;
 }
-
-
+console.log(Finaller(fifaData));
+let FinalMaçları = Finaller(fifaData);
+console.log(Finaller(fifaData)[2].Stadium);
+console.log(Finaller(fifaData).length);
 
 /*  Görev 3: 
 	Bir higher-order fonksiyonu olan Yillar isimli fonksiyona aşağıdakileri uygulayın: 
@@ -39,10 +49,11 @@ function Finaller(/* kodlar buraya */) {
 	3. Finaller data setindeki tüm yılları içeren "years" adındaki diziyi(array) döndürecek
 	*/
 
-function Yillar(/* kodlar buraya */) {
-	
-    /* kodlar buraya */
+function Yillar(GelenArray,GelenFonksiyon) {
+	let Years = GelenFonksiyon(GelenArray).map(i => i["Year"]);
+   return Years;
 }
+console.log(Yillar(fifaData,Finaller));
 
 
 /*  Görev 4: 
@@ -53,12 +64,22 @@ function Yillar(/* kodlar buraya */) {
 	💡 İPUCU: Beraberlikler(ties) için şimdilik endişelenmeyin (Detaylı bilgi için README dosyasına bakabilirsiniz.)
 	4. Tüm kazanan ülkelerin isimlerini içeren `kazananlar` adında bir dizi(array) döndürecek(return)  */ 
 
-function Kazananlar(/* kodlar buraya */) {
-	
-    /* kodlar buraya */
-	
+function Kazananlar(GelenArray,GelenFonksiyon) {
+	let KazananTakımlar = GelenFonksiyon(GelenArray).map(i => {
+		if(i['Home Team Goals']>i['Away Team Goals']){
+			return i['Home Team Name']
+			}
+			else if(i['Home Team Goals']===i['Away Team Goals']){
+				return i['Win conditions'].split(' ')[0]
+			}
+			else  { return i['Away Team Name'];
+			}
+			
+	})
+	return KazananTakımlar;
 }
 
+console.log(Kazananlar(fifaData,Finaller));
 
 
 /*  Görev 5: 
@@ -72,13 +93,17 @@ function Kazananlar(/* kodlar buraya */) {
 	💡 İPUCU: her cümlenin adım 4'te belirtilen cümleyle birebir aynı olması gerekmektedir.
 */
 
-function YillaraGoreKazananlar(/* kodlar buraya */) {
-	
-/* kodlar buraya */
-
+function YillaraGoreKazananlar(GelenArray,G_Finaller,G_Yillar,G_Kazananlar) {
+	let YılKazananları = G_Yillar(GelenArray,G_Finaller);
+	let KazananTakımlar = G_Kazananlar(GelenArray,G_Finaller);
+	let Dizi = [];
+	for( let i = 0 ; i< YılKazananları.length; i++){
+		Dizi.push(`${YılKazananları[i]} yılında, ${KazananTakımlar[i]} dünya kupasını kazandı!`)
+	}
+	return Dizi
 }
-
-
+YillaraGoreKazananlar(fifaData,Finaller,Yillar,Kazananlar);
+console.log(YillaraGoreKazananlar(fifaData,Finaller,Yillar,Kazananlar));
 /*  Görev 6: 
 	Bir higher order fonksiyonu olan `OrtalamaGolSayisi` isimli fonksiyona aşağıdakileri uygulayın: 
 	1. Görev 2'de yazdığınız `Finaller` fonksiyonunu birinci parametre olarak alacak; 'fifaData' dizisini argüman olarak eklediğinizden emin olun
@@ -93,11 +118,18 @@ function YillaraGoreKazananlar(/* kodlar buraya */) {
 	
 */
 
-function OrtalamaGolSayisi(/* kodlar buraya */) {
-	
-    /* kodlar buraya */
-	
+function OrtalamaGolSayisi(G_Finaller) {
+	let ToplamGol = G_Finaller.reduce(
+		(toplam,i)=>{
+			return i['Home Team Goals']+i['Away Team Goals'] +toplam
+		},0);
+
+		let ortalama = ToplamGol / G_Finaller.length;
+
+return ortalama.toFixed(2);
 }
+console.log(OrtalamaGolSayisi(Finaller(fifaData)))
+
 
 
 
